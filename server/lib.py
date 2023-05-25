@@ -4,24 +4,25 @@ import re
 import datetime
 
 def pars_txt_file(data:str):
+    columns = ["Station", "Satellite", "Access", "Start Time (UTCG)", "Stop Time (UTCG)", "Duration (sec)"]
     data = data.split('\n')[4:]
     data = [i for i in data if i != '']
     data = [i for i in data if '-----' not in i]
     data = [i for i in data if 'Duration' not in i]
     data = [i for i in data if 'Global' not in i]
-    result = dict()
+    data_temp = list()
     satellite_name = ''
     for row in data:
         if row[0] != ' ':
-            satellite_name = row.replace("Russia-To-", "")
-            result[satellite_name] = {"Access":[], "Start Time (UTCG)":[], "Stop Time (UTCG)":[], "Duration (sec)":[]}
+            satellite_name = row
         else:
-            temp_string = re.sub(r"(\s{5,})", "    ", row)
-            temp_string = temp_string.split("    ")[1:]
-            result[satellite_name]["Access"].append(int(temp_string[0]))
-            #result[satellite_name]["Start Time (UTCG)"].append(temp_string[1]) 
-            #result[satellite_name]["Stop Time (UTCG)"].append(temp_string[2])
-            result[satellite_name]["Start Time (UTCG)"].append(datetime.datetime.strptime(temp_string[1], "%d %b %Y %H:%M:%S.%f").strftime("%Y-%m-%d %H:%M:%S")) 
-            result[satellite_name]["Stop Time (UTCG)"].append(datetime.datetime.strptime(temp_string[2], "%d %b %Y %H:%M:%S.%f").strftime("%Y-%m-%d %H:%M:%S"))
-            result[satellite_name]["Duration (sec)"].append(int(float(temp_string[3])))
-    return result
+            temp_string = satellite_name + row
+            temp_string = re.sub(r"(\s{5,})", "    ", temp_string)
+            temp_string = temp_string.replace("-To-", ";")
+            temp_string = temp_string.replace("    ", ";")
+            temp_dict = dict(zip(columns, temp_string.split(";")))
+            temp_dict["Start Time (UTCG)"] = datetime.datetime.strptime(temp_dict["Start Time (UTCG)"], "%d %b %Y %H:%M:%S.%f").strftime("%Y-%m-%d %H:%M:%S")
+            temp_dict["Stop Time (UTCG)"] = datetime.datetime.strptime(temp_dict["Stop Time (UTCG)"], "%d %b %Y %H:%M:%S.%f").strftime("%Y-%m-%d %H:%M:%S")
+            temp_dict["Duration (sec)"] = int(float(temp_dict["Duration (sec)"]))
+            data_temp.append(temp_dict)
+    return data_temp
