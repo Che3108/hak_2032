@@ -39,13 +39,7 @@ def upload(file: UploadFile = File(...)):
         # пересобираем результат парсинга в df
         Facility_df = pd.DataFrame(data=results["Facility"], columns=["Station", "Satellite", "Access", "Start Time (UTCG)", "Stop Time (UTCG)", "Duration (sec)"])
         Russia_df = pd.DataFrame(data=results["Russia"], columns=["Station", "Satellite", "Access", "Start Time (UTCG)", "Stop Time (UTCG)", "Duration (sec)"])
-        print(Facility_df.head())
-        print(Russia_df.head())
         
-        with open("result_pars.json", 'w', encoding="utf-8") as f:
-            json.dump(results, f, indent=4, ensure_ascii=True)
-
-
 
         os.system(f'rm -fr {TEMP_FOLDER + "/*"}')
 
