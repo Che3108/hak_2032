@@ -4,7 +4,7 @@ from fastapi import FastAPI, File, UploadFile
 import uvicorn
 import os
 import pandas as pd
-from lib import pars_txt_file
+from lib import pars_txt_file, main_magic
 import json
 
 TEMP_FOLDER = os.path.join(os.getcwd(), "temp")
@@ -39,11 +39,11 @@ def upload(file: UploadFile = File(...)):
         # пересобираем результат парсинга в df
         Facility_df = pd.DataFrame(data=results["Facility"], columns=["Station", "Satellite", "Access", "Start Time (UTCG)", "Stop Time (UTCG)", "Duration (sec)"])
         Russia_df = pd.DataFrame(data=results["Russia"], columns=["Station", "Satellite", "Access", "Start Time (UTCG)", "Stop Time (UTCG)", "Duration (sec)"])
-        
+        results = main_magic(Facility_df, Russia_df)
 
         os.system(f'rm -fr {TEMP_FOLDER + "/*"}')
 
     return {"message": results}
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8008)
+    uvicorn.run(app, host="96.109.6.118", port=8008)
